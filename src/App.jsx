@@ -7,6 +7,7 @@ export default function PokemonSearch() {
   const [pokemonList, setPokemonList] = useState([]);
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [displayCount, setDisplayCount] = useState(20);
@@ -64,6 +65,16 @@ export default function PokemonSearch() {
 
   useEffect(() => {
     let isMounted = true;
+    let hasTimedOut = false;
+
+    const timeoutId = setTimeout(() => {
+      if (isMounted) {
+        hasTimedOut = true;
+        setLoadError(true);
+        setIsLoading(false);
+      }
+    }, 30000);
+
     const fetchPokemons = async () => {
       try {
         const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=10000');
@@ -74,7 +85,9 @@ export default function PokemonSearch() {
         const firstPromises = firstBatch.map(p => axios.get(p.url));
         const firstResults = await Promise.all(firstPromises);
         
-        if (!isMounted) return;
+        if (!isMounted || hasTimedOut) return;
+        clearTimeout(timeoutId);
+
         const firstData = firstResults.map(res => res.data);
         setPokemonList(firstData);
         setIsLoading(false);
@@ -173,6 +186,16 @@ export default function PokemonSearch() {
           <div className="css-pokeball"></div>
           <p className="loader-text">Loading Pokémons...</p>
         </div>
+      ) : loadError ? (
+        <div className="empty-state-container">
+          <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png" alt="Sad Pokemon" className="sad-pokemon" />
+          <p className="loader-text">Pokémons cannot load</p>
+        </div>
+      ) : filteredPokemon.length === 0 ? (
+        <div className="empty-state-container">
+          <div className="pixel-box"></div>
+          <p className="loader-text">Pokémons are not loaded</p>
+        </div>
       ) : (
         <div className="pokedex-grid">
           {displayedPokemon.map((pokemon) => (
@@ -207,7 +230,7 @@ export default function PokemonSearch() {
         </div>
       )}
 
-      {!isLoading && displayCount < filteredPokemon.length && (
+      {!isLoading && !loadError && displayCount < filteredPokemon.length && (
         <div className="load-more-container" style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
           <button 
             className="load-more-btn" 

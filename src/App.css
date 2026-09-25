@@ -1008,3 +1008,59 @@ body, button, input, a, .pokemon-card, .dropdown-item, .pokeball-toggle, .load-m
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
 }
+
+/* Empty / Error State Styles */
+.empty-state-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 40vh;
+    animation: fadeIn 0.5s ease;
+}
+
+.pixel-box {
+    width: 64px;
+    height: 64px;
+    background-color: transparent;
+    border: 4px solid #333;
+    position: relative;
+    box-shadow: 
+        inset 0 0 0 4px #e0e0e0,
+        inset 0 0 0 8px #999,
+        0 8px 0 rgba(0,0,0,0.1);
+    background-image: 
+        linear-gradient(45deg, #ccc 25%, transparent 25%),
+        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%),
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    margin-bottom: 20px;
+}
+
+.pixel-box::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 12px;
+    background: #e0e0e0;
+    border: 4px solid #333;
+    border-bottom: none;
+}
+
+.sad-pokemon {
+    width: 120px;
+    height: 120px;
+    image-rendering: pixelated;
+    animation: bob 2s infinite ease-in-out;
+    filter: grayscale(0.2) drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+
+@keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
